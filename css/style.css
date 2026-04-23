@@ -1,0 +1,19 @@
+        body {
+            background-color: #f5f7fb;
+        }
+
+        .card {
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .locked {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }

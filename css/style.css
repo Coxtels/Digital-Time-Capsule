@@ -1,19 +1,74 @@
-        body {
-            background-color: #f5f7fb;
-        }
+body {
+    background-color: #f5f7fb;
+}
 
-        .card {
-            border-radius: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+.card {
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-        .card:hover {
-            transform: scale(1.02);
-        }
+.card:hover {
+    transform: scale(1.02);
+}
 
-        .locked {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
+.locked {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Animasi kapsul */
+.capsule {
+    width: 80px;
+    height: 80px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: #0d6efd;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.8; }
+}
+
+.unlock-animation {
+    animation: openCapsule 0.6s ease forwards;
+}
+
+@keyframes openCapsule {
+    100% { transform: scale(1.3); opacity: 0; }
+}
+
+.modal-content {
+    border-radius: 15px;
+}
+
+/* ICON MODAL */
+.icon-success {
+    font-size: 50px;
+    color: #28a745;
+    animation: pop 0.4s ease;
+}
+
+.icon-error {
+    font-size: 50px;
+    color: #dc3545;
+    animation: shake 0.4s ease;
+}
+
+/* ANIMASI */
+@keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}

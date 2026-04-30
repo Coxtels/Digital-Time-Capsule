@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="output.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <nav class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+        <div class="text-xl font-bold text-blue-600">
+            <a href="index.html">TimeCapsule</a>
+        </div>
+        <div class="text-sm font-medium text-gray-600 hover:text-blue-600 cursor-pointer transition">
+            Tentang Project
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center">
+
+        <div class="bg-white p-8 w-full max-w-sm rounded-xl shadow-lg">
+            <div class="mb-6">
+                <div class="flex justify-center">
+                    <span class="font-bold text-xl text-gray-700">Pesan Untuk Masa Depan</span>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nama</label>
+                <input type="text" placeholder="Masukkan nama pesan"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
+                <textarea
+                    class="w-full px-4 py-2 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                    placeholder="Ketikan harapanmu di sini..."></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Kapan Kapsul Boleh Dibuka?</label>
+                <input
+                    class="w-full outline-none border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-gray-700"
+                    type="date">
+            </div>
+            <button
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-200">Simpan
+                Pesan</button>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

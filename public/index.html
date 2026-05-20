@@ -19,13 +19,13 @@
 <body class="flex flex-col bg-slate-50 min-h-screen text-slate-800">
 
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 flex justify-between items-center px-6 py-4 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200/50">
+    <nav class="sticky top-0 z-50 h-20 flex justify-between items-center px-6 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200/50">
         <div class="text-2xl font-bold text-indigo-600 tracking-tight">
             <a href="#">Time<span class="text-slate-800">Capsule</span></a>
         </div>
         <div>
-            <a href="create.html" 
-                class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
+            <a href="create.html"
+                class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
                 + Tambah Pesan
             </a>
         </div>
@@ -33,7 +33,7 @@
 
     <!-- Main Content -->
     <main class="flex-grow flex flex-col items-center w-full px-4 sm:px-6 lg:px-8 py-12">
-        
+
         <!-- Header Section -->
         <div class="w-full max-w-5xl text-center mb-10">
             <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-3">
@@ -47,31 +47,96 @@
         <!-- Cards Container -->
         <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            <!-- Card Item -->
-            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col justify-between h-full relative overflow-hidden">
+            <!-- Card 1: Terbuka (Unlocked) -->
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-emerald-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
+                <!-- Decorative top border -->
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                
+                <div class="mb-4 flex items-center justify-between">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        Terbuka
+                    </span>
+                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Harapan Lulus Cumlaude</h3>
+                
+                <!-- Isi Pesan Terbuka -->
+                <div class="flex-grow">
+                    <p class="text-slate-700 leading-relaxed">
+                        Akhirnya pesan ini bisa dibaca. Semoga di tahun ini kita semua sudah lulus dan mendapatkan pekerjaan impian. Jangan lupakan kenangan masa-masa ngerjain tugas web ini ya!
+                    </p>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs text-slate-500">
+                    <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Telah dibuka pada 17 Mei 2026
+                </div>
+            </div>
+
+            <!-- Card 2: Terkunci (Locked with Blur effect) -->
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
                 <!-- Decorative top border -->
                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
                 
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                            Terkunci
-                        </span>
-                        <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">Dar Der Dor</h3>
-                    <p class="text-sm text-slate-500 line-clamp-2">Sebuah pesan untuk masa depan yang belum bisa dibuka saat ini.</p>
+                <div class="mb-4 flex items-center justify-between">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        Terkunci
+                    </span>
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 
-                <div>
-                    <div class="flex items-center text-sm text-slate-500 mb-4 bg-slate-50 p-3 rounded-lg">
-                        <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        Buka pada: <span class="font-semibold text-slate-700 ml-1">19 Nov 2029</span>
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Pesan 5 Tahun Lagi</h3>
+                
+                <!-- Isi Pesan Terkunci (Blur + Overlay) -->
+                <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
+                    <!-- Teks Blur -->
+                    <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                     </div>
-                    <button class="w-full bg-slate-900 text-white font-medium px-4 py-2.5 rounded-xl hover:bg-indigo-600 transition-colors duration-300 focus:ring-4 focus:ring-indigo-100 outline-none">
-                        Lihat Detail
-                    </button>
+                    
+                    <!-- Overlay Icon & Info -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+                        <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-sm mb-2 text-indigo-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+                            Buka: 19 Nov 2029
+                        </span>
+                    </div>
                 </div>
+                
+            </div>
+
+            <!-- Card 3: Terkunci (Locked with Blur effect) -->
+            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                
+                <div class="mb-4 flex items-center justify-between">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        Terkunci
+                    </span>
+                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-slate-900 mb-4">Rahasia Perusahaan</h3>
+                
+                <!-- Isi Pesan Terkunci (Blur + Overlay) -->
+                <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
+                    <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
+                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.
+                    </div>
+                    
+                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+                        <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-sm mb-2 text-indigo-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
+                            Buka: 12 Des 2030
+                        </span>
+                    </div>
+                </div>
+                
             </div>
 
         </div>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - TimeCapsule</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="output.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 h-20 flex justify-between items-center px-6 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200/50">
+        <div class="text-2xl font-bold text-indigo-600 tracking-tight">
+            <a href="index.html">Time<span class="text-slate-800">Capsule</span></a>
+        </div>
+        <div>
+            <a href="register.html" class="inline-flex items-center justify-center bg-slate-100 text-slate-600 py-2 px-5 rounded-full text-sm font-medium hover:bg-slate-200 hover:text-slate-900 transition-all duration-300">
+                Daftar Akun
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center py-12 px-4 sm:px-6">
+
+        <div class="bg-white p-8 w-full max-w-md rounded-2xl shadow-xl border border-slate-200/60 relative overflow-hidden">
+            <!-- Decorative Top Border -->
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+
+            <div class="mb-8 text-center mt-2">
+                <h2 class="font-extrabold text-2xl text-slate-900 tracking-tight">Selamat Datang Kembali</h2>
+                <p class="text-slate-500 text-sm mt-2">Masuk untuk melihat dan mengelola kapsul waktumu.</p>
+            </div>
+
+            <form action="#">
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                    <input type="email" placeholder="nama@email.com"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
+                </div>
+
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-semibold text-slate-700">Password</label>
+                        <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">Lupa Password?</a>
+                    </div>
+                    <input type="password" placeholder="••••••••"
+                        class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
+                </div>
+
+                <button type="button"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-4 focus:ring-indigo-200 outline-none">
+                    Masuk
+                </button>
+            </form>
+
+            <div class="mt-6 text-center text-sm text-slate-500">
+                Belum punya akun? <a href="register.html" class="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">Daftar sekarang</a>
+            </div>
+        </div>
+
+    </main>,
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center">
+            <p class="text-slate-500 text-sm">© 2026 TimeCapsule. All rights reserved.</p>
+            <div class="flex space-x-4 mt-4 sm:mt-0 text-sm text-slate-500">
+                <a href="index.html" class="hover:text-indigo-600 transition-colors">Beranda</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors">Privasi</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

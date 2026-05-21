@@ -23,7 +23,7 @@
         <div class="text-2xl font-bold text-indigo-600 tracking-tight">
             <a href="#">Time<span class="text-slate-800">Capsule</span></a>
         </div>
-        <div>
+        <div class="flex items-center space-x-4" id="navMenu">
             <a href="create.html"
                 class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
                 + Tambah Pesan
@@ -45,100 +45,10 @@
         </div>
 
         <!-- Cards Container -->
-        <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
-            <!-- Card 1: Terbuka (Unlocked) -->
-            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-emerald-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
-                <!-- Decorative top border -->
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
-                
-                <div class="mb-4 flex items-center justify-between">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                        Terbuka
-                    </span>
-                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
-                </div>
-                
-                <h3 class="text-xl font-bold text-slate-900 mb-4">Harapan Lulus Cumlaude</h3>
-                
-                <!-- Isi Pesan Terbuka -->
-                <div class="flex-grow">
-                    <p class="text-slate-700 leading-relaxed">
-                        Akhirnya pesan ini bisa dibaca. Semoga di tahun ini kita semua sudah lulus dan mendapatkan pekerjaan impian. Jangan lupakan kenangan masa-masa ngerjain tugas web ini ya!
-                    </p>
-                </div>
-                
-                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs text-slate-500">
-                    <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    Telah dibuka pada 17 Mei 2026
-                </div>
+        <div id="cardsContainer" class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="col-span-full text-center py-12 text-slate-500">
+                Memuat pesan dari masa depan...
             </div>
-
-            <!-- Card 2: Terkunci (Locked with Blur effect) -->
-            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
-                <!-- Decorative top border -->
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                
-                <div class="mb-4 flex items-center justify-between">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                        Terkunci
-                    </span>
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                
-                <h3 class="text-xl font-bold text-slate-900 mb-4">Pesan 5 Tahun Lagi</h3>
-                
-                <!-- Isi Pesan Terkunci (Blur + Overlay) -->
-                <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
-                    <!-- Teks Blur -->
-                    <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                    </div>
-                    
-                    <!-- Overlay Icon & Info -->
-                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
-                        <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-sm mb-2 text-indigo-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
-                            Buka: 19 Nov 2029
-                        </span>
-                    </div>
-                </div>
-                
-            </div>
-
-            <!-- Card 3: Terkunci (Locked with Blur effect) -->
-            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                
-                <div class="mb-4 flex items-center justify-between">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                        Terkunci
-                    </span>
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                
-                <h3 class="text-xl font-bold text-slate-900 mb-4">Rahasia Perusahaan</h3>
-                
-                <!-- Isi Pesan Terkunci (Blur + Overlay) -->
-                <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
-                    <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi, doloribus?
-                    </div>
-                    
-                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
-                        <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-sm mb-2 text-indigo-500">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
-                            Buka: 12 Des 2030
-                        </span>
-                    </div>
-                </div>
-                
-            </div>
-
         </div>
 
     </main>
@@ -153,6 +63,132 @@
         </div>
     </footer>
 
-</body>
+    <script>
+        // --- 1. Logika Navbar (Login / Logout) ---
+        const userStr = localStorage.getItem('user');
+        const navMenu = document.getElementById('navMenu');
 
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            navMenu.innerHTML = `
+                <span class="text-sm font-medium text-slate-600 hidden sm:inline-block">Halo, <strong>${user.nama_lengkap}</strong></span>
+                <button onclick="logout()" class="inline-flex items-center justify-center bg-white border border-slate-200 text-slate-600 py-2 px-4 rounded-full text-sm font-medium hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300">Keluar</button>
+                <a href="create.html" class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    + Tambah Pesan
+                </a>
+            `;
+        } else {
+            navMenu.innerHTML = `
+                <a href="login.html" class="text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors">Masuk</a>
+                <a href="register.html" class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
+                    Daftar Akun
+                </a>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+
+        // --- 2. Logika Menampilkan Pesan dari Database ---
+        async function fetchMessages() {
+            const container = document.getElementById('cardsContainer');
+            
+            if (!userStr) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center text-center py-16 px-4 bg-white rounded-2xl border border-slate-200/60 shadow-sm">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 mb-5 text-indigo-500">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2">Simpan Rahasia Masa Depanmu</h3>
+                        <p class="text-slate-500 max-w-md mx-auto mb-8 leading-relaxed">Silakan masuk (login) ke akunmu terlebih dahulu untuk mulai membuat dan membaca kapsul waktu milikmu sendiri.</p>
+                        <a href="login.html" class="inline-flex items-center justify-center bg-indigo-600 text-white py-3 px-8 rounded-xl text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5">Masuk ke Akun Sekarang</a>
+                    </div>`;
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+
+            try {
+                const response = await fetch('/api/messages?userId=' + user.id);
+                const messages = await response.json();
+                
+                if (messages.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-12 text-slate-500">Kamu belum memiliki pesan kapsul waktu. Ayo buat pesan pertamamu!</div>';
+                    return;
+                }
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                let html = '';
+                messages.forEach(msg => {
+                    const openDate = new Date(msg.tanggal_buka);
+                    const isLocked = openDate > today;
+                    
+                    // Format tanggal (misal: 12 Des 2030)
+                    const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+                    const formattedDate = openDate.toLocaleDateString('id-ID', dateOptions);
+
+                    if (isLocked) {
+                        html += `
+                            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-slate-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
+                                <div class="mb-4 flex items-center justify-between">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">Terkunci</span>
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">${msg.judul_pesan}</h3>
+                                <p class="text-xs text-slate-500 mb-4">Dari: ${msg.nama_lengkap}</p>
+                                
+                                <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
+                                    <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
+                                        Rahasia masa depan tidak boleh dibaca sekarang. Bersabarlah menunggu waktu yang tepat untuk membuka kapsul ini.
+                                    </div>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+                                        <div class="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-sm mb-2 text-indigo-500">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                        </div>
+                                        <span class="text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm text-center">
+                                            Buka:<br>${formattedDate}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-emerald-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                                <div class="mb-4 flex items-center justify-between">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Terbuka</span>
+                                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">${msg.judul_pesan}</h3>
+                                <p class="text-xs text-slate-500 mb-4">Dari: ${msg.nama_lengkap}</p>
+                                
+                                <div class="flex-grow">
+                                    <p class="text-slate-700 leading-relaxed text-sm whitespace-pre-line">${msg.isi_pesan}</p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs text-slate-500">
+                                    <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Terbuka sejak ${formattedDate}
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+                container.innerHTML = '<div class="col-span-full text-center py-12 text-red-500">Gagal memuat pesan dari server. Pastikan database dan server berjalan.</div>';
+            }
+        }
+
+        // Jalankan saat halaman dibuka
+        fetchMessages();
+    </script>
+</body>
 </html>

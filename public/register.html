@@ -42,26 +42,26 @@
                 <p class="text-slate-500 text-sm mt-2">Buat akun untuk mulai menyimpan memori masa depan.</p>
             </div>
 
-            <form action="#">
+            <form id="registerForm">
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap</label>
-                    <input type="text" placeholder="John Doe"
+                    <input type="text" id="namaLengkap" placeholder="John Doe" required
                         class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
                 </div>
 
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                    <input type="email" placeholder="nama@email.com"
+                    <input type="email" id="email" placeholder="nama@email.com" required
                         class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
                 </div>
 
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-                    <input type="password" placeholder="••••••••"
+                    <input type="password" id="password" placeholder="••••••••" required
                         class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
                 </div>
 
-                <button type="button"
+                <button type="submit" id="submitBtn"
                     class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-0.5 focus:ring-4 focus:ring-indigo-200 outline-none">
                     Daftar Sekarang
                 </button>
@@ -85,6 +85,41 @@
         </div>
     </footer>
 
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nama_lengkap = document.getElementById('namaLengkap').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.textContent = 'Mendaftar...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nama_lengkap, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Registrasi berhasil! Silakan login.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert(data.message || 'Gagal mendaftar.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan saat menghubungi server.');
+            } finally {
+                submitBtn.textContent = 'Daftar Sekarang';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 
 </html>

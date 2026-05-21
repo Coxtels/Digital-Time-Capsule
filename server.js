@@ -96,6 +96,32 @@ app.post('/api/messages', (req, res) => {
   });
 });
 
+// Endpoint 4: Mengambil semua pesan kapsul
+app.get('/api/messages', (req, res) => {
+  const userId = req.query.userId;
+  let query = `
+    SELECT m.*, u.nama_lengkap 
+    FROM messages m 
+    JOIN users u ON m.user_id = u.id 
+  `;
+  const params = [];
+  
+  if (userId) {
+    query += ` WHERE m.user_id = ? `;
+    params.push(userId);
+  }
+  
+  query += ` ORDER BY m.id DESC `;
+
+  db.query(query, params, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Gagal mengambil data pesan' });
+    }
+    res.status(200).json(results);
+  });
+});
+
 // ==========================================
 // MENJALANKAN SERVER
 // ==========================================

@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
+const emailHelper = require('./emailHelper');
 
 const app = express();
 const port = 3000;
@@ -48,6 +50,12 @@ app.post('/api/register', (req, res) => {
       console.error(err);
       return res.status(500).json({ message: 'Gagal melakukan registrasi' });
     }
+
+    // Kirim email notifikasi sukses registrasi (tidak memblokir response jika gagal)
+    emailHelper.sendRegistrationEmail(email, nama_lengkap).catch(errMail => {
+      console.error('Gagal mengirim email registrasi:', errMail);
+    });
+
     res.status(201).json({ message: 'Registrasi berhasil!' });
   });
 });
@@ -92,6 +100,21 @@ app.post('/api/messages', (req, res) => {
       console.error(err);
       return res.status(500).json({ message: 'Gagal menyimpan pesan kapsul' });
     }
+
+    // Ambil data email user untuk mengirim email konfirmasi
+    const userQuery = 'SELECT nama_lengkap, email FROM users WHERE id = ?';
+    db.query(userQuery, [user_id], (errUser, resultUser) => {
+      if (!errUser && resultUser.length > 0) {
+        const user = resultUser[0];
+        // Kirim email notifikasi (tidak memblokir response jika gagal)
+        emailHelper.sendCapsuleCreatedEmail(user.email, user.nama_lengkap, judul_pesan, tanggal_buka).catch(errMail => {
+          console.error('Gagal mengirim email konfirmasi kapsul:', errMail);
+        });
+      } else {
+        console.error('Gagal mengambil data user untuk kirim email kapsul:', errUser);
+      }
+    });
+
     res.status(201).json({ message: 'Pesan kapsul waktu berhasil disimpan!' });
   });
 });

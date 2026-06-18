@@ -48,6 +48,12 @@ npm run build
    
 Setelah itu refresh halaman web di browser.  
  Tampilan yang baru seharusnya sudah muncul.  
+## **5. Setup Email Notifikasi (.env)**  
+Project ini menggunakan Gmail SMTP untuk mengirim email notifikasi.  
+1. Copy file `.env.example` menjadi `.env` di folder utama.  
+2. Isi `GMAIL_USER` dengan alamat email Gmail Anda.  
+3. Buat **App Password** di akun Google Anda (bukan password login biasa) dan isikan di `GMAIL_APP_PASSWORD`.  
+4. Isi `MAIL_FROM_NAME` dengan nama pengirim yang diinginkan (misal: TimeCapsule).
+
 ## **Catatan**  
 Panduan ini bisa dipakai kalau ingin menjalankan project dari awal, terutama kalau database atau server belum aktif.  
-   

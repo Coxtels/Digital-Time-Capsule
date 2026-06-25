@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Email - TimeCapsule</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="output.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+    <nav class="sticky top-0 z-50 h-20 flex justify-between items-center px-6 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200/50">
+        <div class="text-2xl font-bold text-indigo-600 tracking-tight">
+            <a href="index.html">Time<span class="text-slate-800">Capsule</span></a>
+        </div>
+        <div>
+            <a href="login.html" class="inline-flex items-center justify-center bg-slate-100 text-slate-600 py-2 px-5 rounded-full text-sm font-medium hover:bg-slate-200 hover:text-slate-900 transition-all duration-300">
+                Masuk
+            </a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center py-12 px-4 sm:px-6">
+        <div class="bg-white p-8 w-full max-w-md rounded-2xl shadow-xl border border-slate-200/60 relative overflow-hidden">
+            <div id="topBorder" class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+
+            <div class="mt-3 text-center" aria-live="polite">
+                <div id="stateIcon" class="mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                    <svg class="h-8 w-8 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                </div>
+
+                <h1 id="stateTitle" class="font-extrabold text-2xl text-slate-900 tracking-tight">Memverifikasi Email</h1>
+                <p id="stateMessage" class="text-slate-500 text-sm mt-3 leading-relaxed">Tunggu sebentar, kami sedang memeriksa tautan verifikasi kamu.</p>
+
+                <div id="actionArea" class="mt-8 hidden">
+                    <a id="primaryAction" href="login.html" class="inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-200">
+                        Masuk
+                    </a>
+                    <a href="index.html" class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-50 hover:text-slate-900">
+                        Kembali ke Beranda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center">
+            <p class="text-slate-500 text-sm">© 2026 TimeCapsule. All rights reserved.</p>
+            <div class="flex space-x-4 mt-4 sm:mt-0 text-sm text-slate-500">
+                <a href="index.html" class="hover:text-indigo-600 transition-colors">Beranda</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors">Privasi</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const stateIcon = document.getElementById('stateIcon');
+        const stateTitle = document.getElementById('stateTitle');
+        const stateMessage = document.getElementById('stateMessage');
+        const actionArea = document.getElementById('actionArea');
+        const primaryAction = document.getElementById('primaryAction');
+        const topBorder = document.getElementById('topBorder');
+
+        const icons = {
+            success: '<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 13l4 4L19 7"></path></svg>',
+            warning: '<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>',
+            error: '<svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M6 18L18 6M6 6l12 12"></path></svg>'
+        };
+
+        const stateStyles = {
+            success: {
+                icon: 'mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600',
+                border: 'absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500'
+            },
+            warning: {
+                icon: 'mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-amber-50 text-amber-600',
+                border: 'absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 to-orange-500'
+            },
+            error: {
+                icon: 'mx-auto mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600',
+                border: 'absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-400 to-rose-500'
+            }
+        };
+
+        function renderState(type, title, message, actionText) {
+            stateIcon.className = stateStyles[type].icon;
+            topBorder.className = stateStyles[type].border;
+            stateIcon.innerHTML = icons[type];
+            stateTitle.textContent = title;
+            stateMessage.textContent = message;
+            primaryAction.textContent = actionText;
+            actionArea.classList.remove('hidden');
+        }
+
+        async function verifyEmail() {
+            const token = new URLSearchParams(window.location.search).get('token');
+
+            if (!token) {
+                renderState('error', 'Token Tidak Ditemukan', 'Tautan verifikasi tidak lengkap. Masuk dengan email kamu untuk mengirim ulang tautan verifikasi.', 'Ke Halaman Masuk');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/verify-email?token=${encodeURIComponent(token)}`);
+                const data = await response.json().catch(() => ({}));
+
+                if (response.ok) {
+                    renderState('success', 'Email Berhasil Diverifikasi', data.message || 'Akun kamu sudah aktif. Kamu bisa masuk dan mulai membuat kapsul waktu.', 'Masuk Sekarang');
+                    return;
+                }
+
+                if (response.status === 410) {
+                    renderState('warning', 'Tautan Sudah Kedaluwarsa', data.message || 'Tautan verifikasi ini sudah kedaluwarsa. Masuk dengan email kamu untuk mengirim ulang tautan verifikasi.', 'Ke Halaman Masuk');
+                    return;
+                }
+
+                renderState('error', 'Verifikasi Gagal', data.message || 'Tautan verifikasi tidak valid. Masuk dengan email kamu untuk mengirim ulang tautan verifikasi.', 'Ke Halaman Masuk');
+            } catch (error) {
+                console.error(error);
+                renderState('error', 'Server Tidak Terhubung', 'Verifikasi belum bisa diproses karena server tidak merespons.', 'Ke Halaman Masuk');
+            }
+        }
+
+        verifyEmail();
+    </script>
+</body>
+
+</html>

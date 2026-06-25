@@ -42,10 +42,12 @@
                 <p class="text-slate-500 text-sm mt-2">Masuk untuk melihat dan mengelola kapsul waktumu.</p>
             </div>
 
+            <div id="messageBox" class="hidden mb-6 rounded-xl border px-4 py-3 text-sm leading-relaxed"></div>
+
             <form id="loginForm">
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
-                    <input type="email" id="email" placeholder="nama@email.com" required
+                    <input type="email" id="email" name="email" placeholder="nama@email.com" autocomplete="email" required
                         class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
                 </div>
 
@@ -54,7 +56,7 @@
                         <label class="block text-sm font-semibold text-slate-700">Password</label>
                         <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">Lupa Password?</a>
                     </div>
-                    <input type="password" id="password" placeholder="••••••••" required
+                    <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required
                         class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
                 </div>
 
@@ -63,6 +65,11 @@
                     Masuk
                 </button>
             </form>
+
+            <button type="button" id="resendVerificationBtn"
+                class="hidden mt-4 w-full bg-white border border-indigo-200 text-indigo-700 font-semibold py-3 px-4 rounded-xl hover:bg-indigo-50 transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-60">
+                Kirim Ulang Email Verifikasi
+            </button>
 
             <div class="mt-6 text-center text-sm text-slate-500">
                 Belum punya akun? <a href="register.html" class="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">Daftar sekarang</a>
@@ -83,12 +90,60 @@
     </footer>
 
     <script>
+        const messageBox = document.getElementById('messageBox');
+        const resendVerificationBtn = document.getElementById('resendVerificationBtn');
+        let pendingVerificationEmail = '';
+        let resendTimer = null;
+
+        function showMessage(type, message) {
+            const styles = {
+                success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+                warning: 'border-amber-200 bg-amber-50 text-amber-800',
+                error: 'border-red-200 bg-red-50 text-red-700'
+            };
+
+            messageBox.className = `mb-6 rounded-xl border px-4 py-3 text-sm leading-relaxed ${styles[type] || styles.error}`;
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        function hideResendButton() {
+            pendingVerificationEmail = '';
+            resendVerificationBtn.classList.add('hidden');
+            resendVerificationBtn.disabled = false;
+            resendVerificationBtn.textContent = 'Kirim Ulang Email Verifikasi';
+            if (resendTimer) {
+                clearInterval(resendTimer);
+                resendTimer = null;
+            }
+        }
+
+        function startResendCooldown() {
+            let remainingSeconds = 60;
+            resendVerificationBtn.disabled = true;
+            resendVerificationBtn.textContent = `Kirim ulang dalam ${remainingSeconds} detik`;
+
+            resendTimer = setInterval(() => {
+                remainingSeconds -= 1;
+                resendVerificationBtn.textContent = `Kirim ulang dalam ${remainingSeconds} detik`;
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(resendTimer);
+                    resendTimer = null;
+                    resendVerificationBtn.disabled = false;
+                    resendVerificationBtn.textContent = 'Kirim Ulang Email Verifikasi';
+                }
+            }, 1000);
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
             const submitBtn = document.getElementById('submitBtn');
 
+            messageBox.classList.add('hidden');
+            hideResendButton();
             submitBtn.textContent = 'Memeriksa...';
             submitBtn.disabled = true;
 
@@ -106,14 +161,53 @@
                     localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = 'index.html';
                 } else {
-                    alert(data.message || 'Email atau password salah!');
+                    if (data.code === 'EMAIL_NOT_VERIFIED') {
+                        pendingVerificationEmail = email;
+                        resendVerificationBtn.classList.remove('hidden');
+                        showMessage('warning', data.message || 'Email belum diverifikasi. Cek email kamu atau kirim ulang tautan verifikasi.');
+                    } else {
+                        showMessage('error', data.message || 'Email atau password salah!');
+                    }
                 }
             } catch (error) {
                 console.error(error);
-                alert('Terjadi kesalahan saat menghubungi server.');
+                showMessage('error', 'Terjadi kesalahan saat menghubungi server.');
             } finally {
                 submitBtn.textContent = 'Masuk';
                 submitBtn.disabled = false;
+            }
+        });
+
+        resendVerificationBtn.addEventListener('click', async () => {
+            if (!pendingVerificationEmail) {
+                return;
+            }
+
+            resendVerificationBtn.disabled = true;
+            resendVerificationBtn.textContent = 'Mengirim...';
+
+            try {
+                const response = await fetch('/api/resend-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: pendingVerificationEmail })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('success', data.message || 'Email verifikasi akan dikirim jika akun kamu belum terverifikasi.');
+                    startResendCooldown();
+                } else {
+                    showMessage('error', data.message || 'Gagal mengirim ulang email verifikasi.');
+                    resendVerificationBtn.disabled = false;
+                    resendVerificationBtn.textContent = 'Kirim Ulang Email Verifikasi';
+                }
+            } catch (error) {
+                console.error(error);
+                showMessage('error', 'Terjadi kesalahan saat menghubungi server.');
+                resendVerificationBtn.disabled = false;
+                resendVerificationBtn.textContent = 'Kirim Ulang Email Verifikasi';
             }
         });
     </script>

@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const path = require('path');
+const crypto = require('crypto');
 const emailHelper = require('./emailHelper');
 
 const app = express();
@@ -14,12 +15,13 @@ app.use(express.urlencoded({ extended: true }));
 // 2. Menyajikan file HTML/CSS/JS statis dari folder 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 3. Konfigurasi koneksi database MySQL (Laragon)
+// 3. Konfigurasi koneksi database MySQL (Laragon / Docker via .env)
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '', // Password default Laragon kosong
-  database: 'timecapsule_db'
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '', 
+  database: process.env.DB_NAME || 'timecapsule_db',
+  port: process.env.DB_PORT || 3306
 });
 
 // Mengecek koneksi ke database
@@ -37,26 +39,213 @@ db.connect((err) => {
 
 // Endpoint 1: Register (Menyimpan data user baru)
 app.post('/api/register', (req, res) => {
-  // Menggunakan nama_lengkap sesuai kolom di database
-  const { nama_lengkap, email, password } = req.body;
+  let { nama_lengkap, email, password } = req.body;
 
   if (!nama_lengkap || !email || !password) {
     return res.status(400).json({ message: 'Nama lengkap, email, dan password wajib diisi!' });
   }
 
-  const query = 'INSERT INTO users (nama_lengkap, email, password) VALUES (?, ?, ?)';
-  db.query(query, [nama_lengkap, email, password], (err, result) => {
+  email = email.trim().toLowerCase();
+
+  db.query('SELECT id FROM users WHERE email = ?', [email], (err, results) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ message: 'Gagal melakukan registrasi' });
+      return res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    }
+    if (results.length > 0) {
+      return res.status(409).json({ message: 'Email sudah terdaftar!' });
     }
 
-    // Kirim email notifikasi sukses registrasi (tidak memblokir response jika gagal)
-    emailHelper.sendRegistrationEmail(email, nama_lengkap).catch(errMail => {
-      console.error('Gagal mengirim email registrasi:', errMail);
-    });
+    db.beginTransaction((err) => {
+      if (err) {
+        console.error('Transaction start error:', err);
+        return res.status(500).json({ message: 'Gagal memulai transaksi' });
+      }
 
-    res.status(201).json({ message: 'Registrasi berhasil!' });
+      const insertUserQuery = 'INSERT INTO users (nama_lengkap, email, password) VALUES (?, ?, ?)';
+      db.query(insertUserQuery, [nama_lengkap, email, password], (err, result) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error('Insert user error:', err);
+            res.status(500).json({ message: 'Gagal melakukan registrasi' });
+          });
+        }
+
+        const userId = result.insertId;
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+        
+        // Token expires in 24 hours
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+        const insertTokenQuery = 'INSERT INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)';
+        db.query(insertTokenQuery, [userId, tokenHash, expiresAt], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error('Insert token error:', err);
+              res.status(500).json({ message: 'Gagal membuat token verifikasi' });
+            });
+          }
+
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error('Commit error:', err);
+                res.status(500).json({ message: 'Gagal menyelesaikan registrasi' });
+              });
+            }
+
+            const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
+            const verificationLink = `${baseUrl}/verify-email.html?token=${rawToken}`;
+            
+            emailHelper.sendVerificationEmail(email, nama_lengkap, verificationLink)
+              .then(() => {
+                res.status(201).json({ 
+                  message: 'Registrasi berhasil! Silakan cek email Anda untuk verifikasi.',
+                  requiresVerification: true,
+                  emailSent: true
+                });
+              })
+              .catch(errMail => {
+                console.error('Gagal mengirim email verifikasi:', errMail);
+                res.status(201).json({ 
+                  message: 'Registrasi berhasil! Namun email verifikasi gagal dikirim.',
+                  requiresVerification: true,
+                  emailSent: false
+                });
+              });
+          });
+        });
+      });
+    });
+  });
+});
+
+// Endpoint 1b: Verify Email
+app.get('/api/verify-email', (req, res) => {
+  const { token } = req.query;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Token tidak diberikan' });
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Transaction start error:', err);
+      return res.status(500).json({ message: 'Gagal memulai transaksi' });
+    }
+
+    db.query('SELECT user_id, expires_at FROM email_verification_tokens WHERE token_hash = ?', [tokenHash], (err, results) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error('Select token error:', err);
+          res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+        });
+      }
+
+      if (results.length === 0) {
+        return db.rollback(() => {
+          res.status(400).json({ message: 'Token tidak valid atau tidak ditemukan' });
+        });
+      }
+
+      const { user_id, expires_at } = results[0];
+
+      if (new Date() > new Date(expires_at)) {
+        db.query('DELETE FROM email_verification_tokens WHERE token_hash = ?', [tokenHash], () => {
+          db.commit(() => {
+            res.status(410).json({ message: 'Token kedaluwarsa' });
+          });
+        });
+        return;
+      }
+
+      db.query('UPDATE users SET email_verified_at = CURRENT_TIMESTAMP WHERE id = ?', [user_id], (err) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error('Update user error:', err);
+            res.status(500).json({ message: 'Gagal verifikasi email' });
+          });
+        }
+
+        db.query('DELETE FROM email_verification_tokens WHERE token_hash = ?', [tokenHash], (err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error('Delete token error:', err);
+              res.status(500).json({ message: 'Gagal membersihkan token' });
+            });
+          }
+
+          db.commit((err) => {
+            if (err) {
+              return db.rollback(() => {
+                console.error('Commit error:', err);
+                res.status(500).json({ message: 'Gagal menyelesaikan verifikasi' });
+              });
+            }
+
+            res.status(200).json({ message: 'Verifikasi email berhasil' });
+          });
+        });
+      });
+    });
+  });
+});
+
+// Endpoint 1c: Resend Verification
+app.post('/api/resend-verification', (req, res) => {
+  let { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Email wajib diisi' });
+  }
+  
+  email = email.trim().toLowerCase();
+  
+  const genericResponse = () => res.status(200).json({ message: 'Jika akun terdaftar dan belum diverifikasi, email verifikasi akan dikirim.' });
+
+  db.query('SELECT id, nama_lengkap, email_verified_at FROM users WHERE email = ?', [email], (err, results) => {
+    if (err || results.length === 0) {
+      return genericResponse();
+    }
+
+    const user = results[0];
+    if (user.email_verified_at) {
+      return genericResponse(); // Already verified
+    }
+
+    db.query('SELECT created_at FROM email_verification_tokens WHERE user_id = ?', [user.id], (err, tokenResults) => {
+      if (err) {
+        return genericResponse(); // Suppress error
+      }
+      
+      if (tokenResults.length > 0) {
+        const createdAt = new Date(tokenResults[0].created_at);
+        const timeDiffSeconds = (new Date() - createdAt) / 1000;
+        if (timeDiffSeconds < 60) {
+          return genericResponse(); // Cooldown not met
+        }
+      }
+
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+      db.query(
+        'REPLACE INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)',
+        [user.id, tokenHash, expiresAt],
+        (err) => {
+          if (err) return genericResponse();
+          
+          const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
+          const verificationLink = `${baseUrl}/verify-email.html?token=${rawToken}`;
+          emailHelper.sendVerificationEmail(email, user.nama_lengkap, verificationLink).catch(() => {});
+          
+          return genericResponse();
+        }
+      );
+    });
   });
 });
 
@@ -68,7 +257,7 @@ app.post('/api/login', (req, res) => {
     return res.status(400).json({ message: 'Email dan password wajib diisi!' });
   }
 
-  const query = 'SELECT * FROM users WHERE email = ? AND password = ?';
+  const query = 'SELECT id, nama_lengkap, email, email_verified_at FROM users WHERE email = ? AND password = ?';
   db.query(query, [email, password], (err, results) => {
     if (err) {
       console.error(err);
@@ -76,8 +265,17 @@ app.post('/api/login', (req, res) => {
     }
 
     if (results.length > 0) {
+      const user = results[0];
+      if (!user.email_verified_at) {
+        return res.status(403).json({ 
+          message: 'Email belum diverifikasi.',
+          code: 'EMAIL_NOT_VERIFIED'
+        });
+      }
+      
       // Data ditemukan, artinya login sukses
-      res.status(200).json({ message: 'Login berhasil!', user: results[0] });
+      delete user.email_verified_at;
+      res.status(200).json({ message: 'Login berhasil!', user: user });
     } else {
       // Data tidak ditemukan
       res.status(401).json({ message: 'Email atau password salah!' });

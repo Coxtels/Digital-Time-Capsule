@@ -48,12 +48,29 @@ npm run build
    
 Setelah itu refresh halaman web di browser.  
  Tampilan yang baru seharusnya sudah muncul.  
-## **5. Setup Email Notifikasi (.env)**  
-Project ini menggunakan Gmail SMTP untuk mengirim email notifikasi.  
+## **5. Konfigurasi Environment (.env)**  
+Project ini menggunakan file `.env` untuk mengatur konfigurasi database dan email (menggunakan Gmail SMTP).  
 1. Copy file `.env.example` menjadi `.env` di folder utama.  
-2. Isi `GMAIL_USER` dengan alamat email Gmail Anda.  
-3. Buat **App Password** di akun Google Anda (bukan password login biasa) dan isikan di `GMAIL_APP_PASSWORD`.  
-4. Isi `MAIL_FROM_NAME` dengan nama pengirim yang diinginkan (misal: TimeCapsule).
+2. Konfigurasi Database (Kompatibel dengan Laragon dan Docker):
+   ```env
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASSWORD=
+   DB_NAME=timecapsule_db
+   APP_BASE_URL=http://localhost:3000
+   ```
+   *(Ubah nilai-nilai ini jika menggunakan Docker atau konfigurasi custom).*
+3. Setup Email:
+   - Isi `GMAIL_USER` dengan alamat email Gmail Anda.  
+   - Buat **App Password** di akun Google Anda dan isikan di `GMAIL_APP_PASSWORD`.  
+   - Isi `MAIL_FROM_NAME` dengan nama pengirim (misal: TimeCapsule).
+
+## **6. API Endpoints (Verifikasi Email)**
+- `POST /api/register`: Membuat akun dan mengirim email verifikasi (mengembalikan `requiresVerification: true`).
+- `GET /api/verify-email?token=...`: Memverifikasi email dengan token yang dikirim.
+- `POST /api/resend-verification`: Mengirim ulang email verifikasi dengan cooldown 60 detik.
+- `POST /api/login`: Membutuhkan akun terverifikasi. Jika belum, akan mengembalikan 403 `EMAIL_NOT_VERIFIED`.
 
 ## **Catatan**  
-Panduan ini bisa dipakai kalau ingin menjalankan project dari awal, terutama kalau database atau server belum aktif.  
+Panduan ini bisa dipakai kalau ingin menjalankan project dari awal, terutama kalau database atau server belum aktif.

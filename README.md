@@ -12,6 +12,7 @@ Project ini dibuat sebagai aplikasi full-stack sederhana dengan backend Node.js,
 - Membuat pesan kapsul waktu dengan tanggal buka.
 - Menampilkan pesan terkunci sebelum tanggal buka.
 - Menampilkan isi pesan setelah tanggal buka tercapai.
+- Menandai harapan pada pesan terbuka sebagai tercapai atau belum tercapai.
 - Notifikasi email saat akun dibuat dan saat kapsul berhasil disimpan.
 
 ## Tech Stack
@@ -28,7 +29,8 @@ Project ini dibuat sebagai aplikasi full-stack sederhana dengan backend Node.js,
 .
 ├── database/
 │   ├── migrations/
-│   │   └── 001_add_email_verification.sql
+│   │   ├── 001_add_email_verification.sql
+│   │   └── 002_add_message_evaluation.sql
 │   └── timecapsule_db.sql
 ├── public/
 │   ├── create.html
@@ -119,10 +121,11 @@ Import schema awal:
 mysql -u root -p timecapsule_db < database/timecapsule_db.sql
 ```
 
-Jika database sudah ada sebelum fitur verifikasi email ditambahkan, jalankan migration berikut satu kali:
+Jika database sudah ada sebelum fitur verifikasi email dan evaluasi pesan ditambahkan, jalankan migration berikut satu kali secara berurutan:
 
 ```bash
 mysql -u root -p timecapsule_db < database/migrations/001_add_email_verification.sql
+mysql -u root -p timecapsule_db < database/migrations/002_add_message_evaluation.sql
 ```
 
 Untuk environment tanpa password MySQL, hilangkan opsi `-p`.
@@ -192,6 +195,7 @@ Token verifikasi berlaku selama 24 jam. Jika token kedaluwarsa atau email tidak 
 | --- | --- | --- |
 | `POST` | `/api/messages` | Membuat kapsul waktu baru. |
 | `GET` | `/api/messages?userId=...` | Mengambil daftar kapsul waktu milik pengguna. |
+| `PATCH` | `/api/messages/:id/evaluation` | Menyimpan status capaian dan catatan evaluasi pesan yang sudah terbuka. |
 
 ## Contoh Response Penting
 

@@ -53,6 +53,66 @@
 
     </main>
 
+    <div id="evaluationModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="evaluationTitle">
+        <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200">
+            <div class="mb-6">
+                <h2 id="evaluationTitle" class="text-xl font-bold text-slate-900">Evaluasi Harapan</h2>
+                <p class="mt-2 text-sm leading-relaxed text-slate-500">Tandai apakah harapan pada kapsul ini sudah tercapai, lalu tambahkan catatan singkat jika perlu.</p>
+            </div>
+
+            <form id="evaluationForm">
+                <input type="hidden" id="evaluationMessageId">
+
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">Status Capaian</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" type="radio" name="status_capaian" value="belum_ditandai" required>
+                            <span class="flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-sm font-semibold text-slate-600 transition-all peer-checked:border-slate-500 peer-checked:bg-slate-100 peer-checked:text-slate-900">
+                                Belum Ditandai
+                            </span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" type="radio" name="status_capaian" value="tercapai">
+                            <span class="flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-sm font-semibold text-slate-600 transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700">
+                                Tercapai
+                            </span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" type="radio" name="status_capaian" value="belum_tercapai">
+                            <span class="flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-center text-sm font-semibold text-slate-600 transition-all peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-700">
+                                Belum Tercapai
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="mb-2 flex items-center justify-between">
+                        <label for="evaluationNote" class="block text-sm font-semibold text-slate-700">Catatan Refleksi</label>
+                        <span class="text-xs text-slate-400"><span id="evaluationCharCount">0</span>/1000</span>
+                    </div>
+                    <textarea id="evaluationNote" rows="4" maxlength="1000"
+                        class="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50"
+                        placeholder="Tulis hasil refleksi singkat setelah kapsul ini terbuka..."></textarea>
+                </div>
+
+                <div id="evaluationFeedback" class="hidden mb-4 rounded-xl border px-4 py-3 text-sm leading-relaxed"></div>
+
+                <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                    <button type="button" id="evaluationCancel"
+                        class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-50 hover:text-slate-900">
+                        Batal
+                    </button>
+                    <button type="submit" id="evaluationSubmit"
+                        class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60">
+                        Simpan Evaluasi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer class="bg-white border-t border-slate-200 mt-auto">
         <div class="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center">
             <p class="text-slate-500 text-sm">© 2026 TimeCapsule. All rights reserved.</p>
@@ -66,12 +126,12 @@
     <script>
         // --- 1. Logika Navbar (Login / Logout) ---
         const userStr = localStorage.getItem('user');
+        const currentUser = userStr ? JSON.parse(userStr) : null;
         const navMenu = document.getElementById('navMenu');
 
-        if (userStr) {
-            const user = JSON.parse(userStr);
+        if (currentUser) {
             navMenu.innerHTML = `
-                <span class="text-sm font-medium text-slate-600 hidden sm:inline-block">Halo, <strong>${user.nama_lengkap}</strong></span>
+                <span class="text-sm font-medium text-slate-600 hidden sm:inline-block">Halo, <strong>${currentUser.nama_lengkap}</strong></span>
                 <button onclick="logout()" class="inline-flex items-center justify-center bg-white border border-slate-200 text-slate-600 py-2 px-4 rounded-full text-sm font-medium hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300">Keluar</button>
                 <a href="create.html" class="inline-flex items-center justify-center bg-indigo-600 text-white py-2 px-5 rounded-full text-sm font-medium hover:bg-indigo-700 hover:shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-0.5">
                     + Tambah Pesan
@@ -91,11 +151,158 @@
             window.location.reload();
         }
 
+        const evaluationModal = document.getElementById('evaluationModal');
+        const evaluationForm = document.getElementById('evaluationForm');
+        const evaluationMessageId = document.getElementById('evaluationMessageId');
+        const evaluationNote = document.getElementById('evaluationNote');
+        const evaluationCharCount = document.getElementById('evaluationCharCount');
+        const evaluationFeedback = document.getElementById('evaluationFeedback');
+        const evaluationSubmit = document.getElementById('evaluationSubmit');
+        const evaluationCancel = document.getElementById('evaluationCancel');
+
+        const evaluationMeta = {
+            belum_ditandai: {
+                label: 'Belum Ditandai',
+                badgeClass: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-600 border border-slate-200'
+            },
+            tercapai: {
+                label: 'Tercapai',
+                badgeClass: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100'
+            },
+            belum_tercapai: {
+                label: 'Belum Tercapai',
+                badgeClass: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100'
+            }
+        };
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, (char) => {
+                const entities = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+
+                return entities[char];
+            });
+        }
+
+        function getEvaluationMeta(status) {
+            return evaluationMeta[status] || evaluationMeta.belum_ditandai;
+        }
+
+        function setEvaluationFeedback(type, message) {
+            const styles = {
+                success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+                error: 'border-red-200 bg-red-50 text-red-700'
+            };
+
+            evaluationFeedback.className = `mb-4 rounded-xl border px-4 py-3 text-sm leading-relaxed ${styles[type] || styles.error}`;
+            evaluationFeedback.textContent = message;
+            evaluationFeedback.classList.remove('hidden');
+        }
+
+        function openEvaluationModal(messageId, status, note) {
+            evaluationMessageId.value = messageId;
+            evaluationNote.value = note || '';
+            evaluationCharCount.textContent = evaluationNote.value.length;
+            evaluationFeedback.classList.add('hidden');
+            evaluationSubmit.disabled = false;
+            evaluationSubmit.textContent = 'Simpan Evaluasi';
+
+            const selectedStatus = evaluationMeta[status] ? status : 'belum_ditandai';
+            evaluationForm.querySelectorAll('input[name="status_capaian"]').forEach((input) => {
+                input.checked = input.value === selectedStatus;
+            });
+
+            evaluationModal.classList.remove('hidden');
+            evaluationModal.classList.add('flex');
+            evaluationNote.focus();
+        }
+
+        function closeEvaluationModal() {
+            evaluationModal.classList.add('hidden');
+            evaluationModal.classList.remove('flex');
+        }
+
+        function bindEvaluationButtons(container) {
+            container.querySelectorAll('[data-evaluation-button]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    openEvaluationModal(
+                        button.dataset.messageId,
+                        button.dataset.status || 'belum_ditandai',
+                        decodeURIComponent(button.dataset.note || '')
+                    );
+                });
+            });
+        }
+
+        evaluationNote.addEventListener('input', () => {
+            evaluationCharCount.textContent = evaluationNote.value.length;
+        });
+
+        evaluationCancel.addEventListener('click', closeEvaluationModal);
+
+        evaluationModal.addEventListener('click', (event) => {
+            if (event.target === evaluationModal) {
+                closeEvaluationModal();
+            }
+        });
+
+        evaluationForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!currentUser) {
+                setEvaluationFeedback('error', 'Kamu harus login untuk menyimpan evaluasi.');
+                return;
+            }
+
+            const selectedStatus = evaluationForm.querySelector('input[name="status_capaian"]:checked');
+            if (!selectedStatus) {
+                setEvaluationFeedback('error', 'Pilih status capaian terlebih dahulu.');
+                return;
+            }
+
+            evaluationSubmit.disabled = true;
+            evaluationSubmit.textContent = 'Menyimpan...';
+            evaluationFeedback.classList.add('hidden');
+
+            try {
+                const response = await fetch(`/api/messages/${evaluationMessageId.value}/evaluation`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        status_capaian: selectedStatus.value,
+                        catatan_capaian: evaluationNote.value
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    setEvaluationFeedback('error', data.message || 'Gagal menyimpan evaluasi.');
+                    return;
+                }
+
+                closeEvaluationModal();
+                fetchMessages();
+            } catch (error) {
+                console.error(error);
+                setEvaluationFeedback('error', 'Terjadi kesalahan saat menghubungi server.');
+            } finally {
+                evaluationSubmit.disabled = false;
+                evaluationSubmit.textContent = 'Simpan Evaluasi';
+            }
+        });
+
         // --- 2. Logika Menampilkan Pesan dari Database ---
         async function fetchMessages() {
             const container = document.getElementById('cardsContainer');
             
-            if (!userStr) {
+            if (!currentUser) {
                 container.innerHTML = `
                     <div class="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center w-full">
                         <div class="w-full max-w-md flex flex-col items-center justify-center text-center py-12 px-6 bg-white rounded-2xl border border-slate-200/60 shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -110,10 +317,8 @@
                 return;
             }
 
-            const user = JSON.parse(userStr);
-
             try {
-                const response = await fetch('/api/messages?userId=' + user.id);
+                const response = await fetch('/api/messages?userId=' + currentUser.id);
                 const messages = await response.json();
                 
                 if (messages.length === 0) {
@@ -128,10 +333,21 @@
                 messages.forEach(msg => {
                     const openDate = new Date(msg.tanggal_buka);
                     const isLocked = openDate > today;
+                    const title = escapeHtml(msg.judul_pesan);
+                    const senderName = escapeHtml(msg.nama_lengkap);
+                    const content = escapeHtml(msg.isi_pesan);
+                    const evaluationStatus = msg.status_capaian || 'belum_ditandai';
+                    const evaluation = getEvaluationMeta(evaluationStatus);
+                    const evaluationNoteText = msg.catatan_capaian || '';
+                    const escapedEvaluationNote = escapeHtml(evaluationNoteText);
+                    const encodedEvaluationNote = encodeURIComponent(evaluationNoteText);
                     
                     // Format tanggal (misal: 12 Des 2030)
                     const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
                     const formattedDate = openDate.toLocaleDateString('id-ID', dateOptions);
+                    const formattedEvaluationDate = msg.tanggal_evaluasi
+                        ? new Date(msg.tanggal_evaluasi).toLocaleDateString('id-ID', dateOptions)
+                        : '';
 
                     if (isLocked) {
                         html += `
@@ -141,8 +357,8 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">Terkunci</span>
                                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                 </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-1">${msg.judul_pesan}</h3>
-                                <p class="text-xs text-slate-500 mb-4">Dari: ${msg.nama_lengkap}</p>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">${title}</h3>
+                                <p class="text-xs text-slate-500 mb-4">Dari: ${senderName}</p>
                                 
                                 <div class="flex-grow relative rounded-lg overflow-hidden flex items-center justify-center bg-slate-50/50 p-4 border border-slate-100">
                                     <div class="blur-sm opacity-60 select-none text-slate-500 text-sm line-clamp-4">
@@ -163,26 +379,41 @@
                         html += `
                             <div class="group bg-white rounded-2xl shadow-sm hover:shadow-xl border border-emerald-200/60 p-6 transition-all duration-300 flex flex-col h-full relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
-                                <div class="mb-4 flex items-center justify-between">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Terbuka</span>
+                                <div class="mb-4 flex items-start justify-between gap-3">
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Terbuka</span>
+                                        <span class="${evaluation.badgeClass}">${evaluation.label}</span>
+                                    </div>
                                     <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
                                 </div>
-                                <h3 class="text-xl font-bold text-slate-900 mb-1">${msg.judul_pesan}</h3>
-                                <p class="text-xs text-slate-500 mb-4">Dari: ${msg.nama_lengkap}</p>
+                                <h3 class="text-xl font-bold text-slate-900 mb-1">${title}</h3>
+                                <p class="text-xs text-slate-500 mb-4">Dari: ${senderName}</p>
                                 
                                 <div class="flex-grow">
-                                    <p class="text-slate-700 leading-relaxed text-sm whitespace-pre-line">${msg.isi_pesan}</p>
+                                    <p class="text-slate-700 leading-relaxed text-sm whitespace-pre-line">${content}</p>
                                 </div>
+                                ${evaluationNoteText ? `
+                                    <div class="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Catatan Evaluasi</p>
+                                        <p class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-line">${escapedEvaluationNote}</p>
+                                        ${formattedEvaluationDate ? `<p class="mt-3 text-xs text-slate-400">Diperbarui ${formattedEvaluationDate}</p>` : ''}
+                                    </div>
+                                ` : ''}
                                 <div class="mt-6 pt-4 border-t border-slate-100 flex items-center text-xs text-slate-500">
                                     <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     Terbuka sejak ${formattedDate}
                                 </div>
+                                <button type="button" data-evaluation-button data-message-id="${msg.id}" data-status="${evaluationStatus}" data-note="${encodedEvaluationNote}"
+                                    class="mt-4 inline-flex items-center justify-center rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm font-semibold text-emerald-700 transition-all duration-300 hover:bg-emerald-50 hover:border-emerald-300">
+                                    ${evaluationStatus === 'belum_ditandai' ? 'Tambah Evaluasi' : 'Ubah Evaluasi'}
+                                </button>
                             </div>
                         `;
                     }
                 });
 
                 container.innerHTML = html;
+                bindEvaluationButtons(container);
             } catch (error) {
                 console.error('Error fetching messages:', error);
                 container.innerHTML = '<div class="col-span-full text-center py-12 text-red-500">Gagal memuat pesan dari server. Pastikan database dan server berjalan.</div>';

@@ -317,6 +317,70 @@ app.post('/api/messages', (req, res) => {
   });
 });
 
+// Endpoint 3b: Menyimpan evaluasi capaian pesan yang sudah terbuka
+app.patch('/api/messages/:id/evaluation', (req, res) => {
+  const messageId = Number(req.params.id);
+  const { user_id, status_capaian, catatan_capaian } = req.body;
+  const allowedStatuses = ['belum_ditandai', 'tercapai', 'belum_tercapai'];
+
+  if (!Number.isInteger(messageId) || messageId <= 0) {
+    return res.status(400).json({ message: 'ID pesan tidak valid' });
+  }
+
+  if (!user_id || !allowedStatuses.includes(status_capaian)) {
+    return res.status(400).json({ message: 'User ID dan status capaian wajib diisi dengan benar' });
+  }
+
+  const normalizedNote = typeof catatan_capaian === 'string' && catatan_capaian.trim()
+    ? catatan_capaian.trim()
+    : null;
+
+  if (normalizedNote && normalizedNote.length > 1000) {
+    return res.status(400).json({ message: 'Catatan evaluasi maksimal 1000 karakter' });
+  }
+
+  db.query(
+    'SELECT id, tanggal_buka FROM messages WHERE id = ? AND user_id = ?',
+    [messageId, user_id],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Gagal memeriksa pesan' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Pesan tidak ditemukan' });
+      }
+
+      const openDate = new Date(results[0].tanggal_buka);
+      if (openDate > new Date()) {
+        return res.status(400).json({ message: 'Pesan masih terkunci dan belum bisa dievaluasi' });
+      }
+
+      const updateQuery = `
+        UPDATE messages
+        SET status_capaian = ?, catatan_capaian = ?, tanggal_evaluasi = CURRENT_TIMESTAMP
+        WHERE id = ? AND user_id = ?
+      `;
+
+      db.query(updateQuery, [status_capaian, normalizedNote, messageId, user_id], (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: 'Gagal menyimpan evaluasi pesan' });
+        }
+
+        res.status(200).json({
+          message: 'Evaluasi pesan berhasil disimpan',
+          evaluation: {
+            status_capaian,
+            catatan_capaian: normalizedNote
+          }
+        });
+      });
+    }
+  );
+});
+
 // Endpoint 4: Mengambil semua pesan kapsul
 app.get('/api/messages', (req, res) => {
   const userId = req.query.userId;

@@ -32,7 +32,10 @@ CREATE TABLE `messages` (
   `user_id` int NOT NULL,
   `judul_pesan` varchar(255) NOT NULL,
   `isi_pesan` text NOT NULL,
-  `tanggal_buka` datetime NOT NULL
+  `tanggal_buka` datetime NOT NULL,
+  `status_capaian` enum('belum_ditandai','tercapai','belum_tercapai') NOT NULL DEFAULT 'belum_ditandai',
+  `catatan_capaian` text DEFAULT NULL,
+  `tanggal_evaluasi` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

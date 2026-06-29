@@ -81,6 +81,22 @@
 
     </main>
 
+    <div id="notificationModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="notificationTitle">
+        <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl border border-slate-200">
+            <div id="notificationIcon" class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 id="notificationTitle" class="text-lg font-bold text-slate-900">Pesan Berhasil Disimpan</h3>
+            <p id="notificationMessage" class="mt-2 text-sm leading-relaxed text-slate-500">Kapsul waktu kamu sudah tersimpan.</p>
+            <button type="button" id="notificationAction"
+                class="mt-6 inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200">
+                Kembali ke Beranda
+            </button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 mt-auto">
         <div class="max-w-5xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center">
@@ -101,6 +117,50 @@
         }
         
         const user = JSON.parse(userStr);
+        const notificationModal = document.getElementById('notificationModal');
+        const notificationIcon = document.getElementById('notificationIcon');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const notificationAction = document.getElementById('notificationAction');
+        let shouldRedirectAfterModal = false;
+
+        const notificationStates = {
+            success: {
+                iconClass: 'mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600',
+                buttonClass: 'mt-6 inline-flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-200',
+                icon: '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 13l4 4L19 7"></path></svg>'
+            },
+            error: {
+                iconClass: 'mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600',
+                buttonClass: 'mt-6 inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200',
+                icon: '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M6 18L18 6M6 6l12 12"></path></svg>'
+            }
+        };
+
+        function showNotification(type, title, message, actionText, redirectAfterClose) {
+            const state = notificationStates[type] || notificationStates.error;
+            shouldRedirectAfterModal = redirectAfterClose;
+            notificationIcon.className = state.iconClass;
+            notificationIcon.innerHTML = state.icon;
+            notificationAction.className = state.buttonClass;
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notificationAction.textContent = actionText;
+            notificationModal.classList.remove('hidden');
+            notificationModal.classList.add('flex');
+            notificationAction.focus();
+        }
+
+        function closeNotification() {
+            notificationModal.classList.add('hidden');
+            notificationModal.classList.remove('flex');
+
+            if (shouldRedirectAfterModal) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        notificationAction.addEventListener('click', closeNotification);
 
         document.getElementById('createForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -127,14 +187,31 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    alert('Pesan kapsul waktu berhasil disimpan di database!');
-                    window.location.href = 'index.html';
+                    showNotification(
+                        'success',
+                        'Pesan Berhasil Disimpan',
+                        'Kapsul waktu kamu sudah tersimpan dan notifikasi email akan dikirim jika konfigurasi email aktif.',
+                        'Kembali ke Beranda',
+                        true
+                    );
                 } else {
-                    alert(data.message || 'Gagal menyimpan pesan.');
+                    showNotification(
+                        'error',
+                        'Gagal Menyimpan Pesan',
+                        data.message || 'Pesan belum bisa disimpan. Periksa kembali data yang kamu isi.',
+                        'Coba Lagi',
+                        false
+                    );
                 }
             } catch (error) {
                 console.error(error);
-                alert('Terjadi kesalahan saat menghubungi server.');
+                showNotification(
+                    'error',
+                    'Server Tidak Terhubung',
+                    'Terjadi kesalahan saat menghubungi server. Pastikan backend dan database sedang berjalan.',
+                    'Tutup',
+                    false
+                );
             } finally {
                 submitBtn.textContent = 'Simpan Pesan';
                 submitBtn.disabled = false;

@@ -56,8 +56,17 @@
                         <label class="block text-sm font-semibold text-slate-700">Password</label>
                         <a href="#" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors">Lupa Password?</a>
                     </div>
-                    <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required
-                        class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
+                    <div class="relative">
+                        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-xl px-4 py-3 pr-12 outline-none focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all duration-300 placeholder:text-slate-400">
+                        <button type="button" id="togglePassword" aria-label="Tampilkan password" title="Tampilkan password"
+                            class="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-slate-400 hover:text-indigo-600 focus:outline-none focus:text-indigo-600">
+                            <svg id="eyeIcon" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15.25A3.25 3.25 0 1012 8.75a3.25 3.25 0 000 6.5z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" id="submitBtn"
@@ -92,8 +101,31 @@
     <script>
         const messageBox = document.getElementById('messageBox');
         const resendVerificationBtn = document.getElementById('resendVerificationBtn');
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        const eyeIcon = document.getElementById('eyeIcon');
         let pendingVerificationEmail = '';
         let resendTimer = null;
+
+        const eyeSvg = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15.25A3.25 3.25 0 1012 8.75a3.25 3.25 0 000 6.5z"></path>
+        `;
+
+        const eyeOffSvg = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.73 5.08A9.5 9.5 0 0112 5.25c6 0 9.75 6.75 9.75 6.75a17.6 17.6 0 01-3.05 3.86"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.53 6.51C3.82 8.25 2.25 12 2.25 12S6 18.75 12 18.75a8.87 8.87 0 004.05-.98"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 9.88a3.25 3.25 0 004.37 4.37"></path>
+        `;
+
+        togglePassword.addEventListener('click', () => {
+            const shouldShowPassword = passwordInput.type === 'password';
+            passwordInput.type = shouldShowPassword ? 'text' : 'password';
+            togglePassword.setAttribute('aria-label', shouldShowPassword ? 'Sembunyikan password' : 'Tampilkan password');
+            togglePassword.setAttribute('title', shouldShowPassword ? 'Sembunyikan password' : 'Tampilkan password');
+            eyeIcon.innerHTML = shouldShowPassword ? eyeOffSvg : eyeSvg;
+        });
 
         function showMessage(type, message) {
             const styles = {

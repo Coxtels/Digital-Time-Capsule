@@ -1,8 +1,16 @@
 const nodemailer = require('nodemailer');
 
 const createTransporter = () => {
+  const smtpPort = Number(process.env.SMTP_PORT || 587);
+
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: smtpPort,
+    secure: process.env.SMTP_SECURE === 'true' || smtpPort === 465,
+    requireTLS: smtpPort === 587,
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD

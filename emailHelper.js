@@ -1,14 +1,41 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns').promises;
+const net = require('net');
 
-const createTransporter = () => {
+const resolveSmtpConnectionTarget = async (smtpHost) => {
+  if (process.env.SMTP_FORCE_IPV4 === 'false' || net.isIP(smtpHost)) {
+    return {
+      host: smtpHost,
+      servername: net.isIP(smtpHost) ? process.env.SMTP_SERVERNAME || 'smtp.gmail.com' : smtpHost
+    };
+  }
+
+  const addresses = await dns.resolve4(smtpHost);
+
+  if (!addresses.length) {
+    throw new Error(`Tidak menemukan alamat IPv4 untuk SMTP host ${smtpHost}`);
+  }
+
+  return {
+    host: addresses[0],
+    servername: smtpHost
+  };
+};
+
+const createTransporter = async () => {
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
   const smtpPort = Number(process.env.SMTP_PORT || 587);
+  const connectionTarget = await resolveSmtpConnectionTarget(smtpHost);
 
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    host: connectionTarget.host,
     port: smtpPort,
     secure: process.env.SMTP_SECURE === 'true' || smtpPort === 465,
     requireTLS: smtpPort === 587,
-    family: Number(process.env.SMTP_FAMILY || 4),
+    servername: connectionTarget.servername,
+    tls: {
+      servername: connectionTarget.servername
+    },
     connectionTimeout: 20000,
     greetingTimeout: 20000,
     socketTimeout: 30000,
@@ -21,7 +48,7 @@ const createTransporter = () => {
 
 const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {
   try {
-    const transporter = createTransporter();
+    const transporter = await createTransporter();
     
     // Escape simple HTML characters for safety in HTML email
     const escapeHtml = (text) => {
@@ -64,7 +91,7 @@ const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {
 
 const sendCapsuleCreatedEmail = async (email, nama_lengkap, judul_pesan, tanggal_buka) => {
   try {
-    const transporter = createTransporter();
+    const transporter = await createTransporter();
     
     // Format tanggal untuk bahasa Indonesia
     const date = new Date(tanggal_buka);

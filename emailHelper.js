@@ -8,6 +8,7 @@ const createTransporter = () => {
     port: smtpPort,
     secure: process.env.SMTP_SECURE === 'true' || smtpPort === 465,
     requireTLS: smtpPort === 587,
+    family: Number(process.env.SMTP_FAMILY || 4),
     connectionTimeout: 20000,
     greetingTimeout: 20000,
     socketTimeout: 30000,

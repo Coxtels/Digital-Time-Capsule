@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const emailHelper = require('./emailHelper');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // 1. Middleware untuk membaca data dari request body (format JSON dan form-urlencoded)
 app.use(express.json());

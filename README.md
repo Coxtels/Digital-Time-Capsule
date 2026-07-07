@@ -88,6 +88,13 @@ Isi file `.env` sesuai environment lokal atau server deploy:
 GMAIL_USER=email_pengirim@gmail.com
 GMAIL_APP_PASSWORD=app_password_gmail
 MAIL_FROM_NAME=TimeCapsule
+EMAIL_PROVIDER=smtp
+
+# Jika deploy di Railway dan SMTP diblokir, gunakan Mailjet API
+MAILJET_API_KEY=
+MAILJET_API_SECRET=
+MAILJET_SENDER_EMAIL=
+MAILJET_SENDER_NAME=TimeCapsule
 
 APP_BASE_URL=http://localhost:3000
 
@@ -102,6 +109,8 @@ Keterangan:
 
 - `GMAIL_USER` adalah email sistem yang mengirim notifikasi.
 - `GMAIL_APP_PASSWORD` adalah Google App Password, bukan password login Gmail biasa.
+- `EMAIL_PROVIDER=smtp` menggunakan Gmail SMTP. Untuk Railway, gunakan `EMAIL_PROVIDER=mailjet`.
+- `MAILJET_*` digunakan saat email dikirim lewat Mailjet API.
 - `APP_BASE_URL` digunakan untuk membuat link verifikasi email.
 - `DB_*` digunakan untuk koneksi backend ke MySQL.
 

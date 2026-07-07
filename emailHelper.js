@@ -48,7 +48,22 @@ const isRetryableSmtpConnectionError = (error) => {
   return ['ETIMEDOUT', 'ESOCKET', 'ECONNECTION', 'ENETUNREACH', 'ECONNREFUSED'].includes(error.code);
 };
 
-const sendMail = async (mailOptions, label) => {
+const parseEmailAddress = (address) => {
+  const match = String(address || '').match(/^(?:"?([^"<]*)"?\s*)?<([^<>@\s]+@[^<>@\s]+)>$/);
+
+  if (match) {
+    return {
+      name: match[1] ? match[1].trim() : undefined,
+      email: match[2].trim()
+    };
+  }
+
+  return {
+    email: String(address || '').trim()
+  };
+};
+
+const sendMailViaSmtp = async (mailOptions, label) => {
   const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
   const targets = await resolveSmtpConnectionTargets(smtpHost);
   let lastError;
@@ -75,6 +90,69 @@ const sendMail = async (mailOptions, label) => {
   }
 
   throw lastError;
+};
+
+const sendMailViaMailjet = async (mailOptions, label) => {
+  const apiKey = process.env.MAILJET_API_KEY || process.env.MJ_APIKEY_PUBLIC;
+  const apiSecret = process.env.MAILJET_API_SECRET || process.env.MJ_APIKEY_PRIVATE;
+  const senderEmail = process.env.MAILJET_SENDER_EMAIL || process.env.GMAIL_USER;
+  const senderName = process.env.MAILJET_SENDER_NAME || process.env.MAIL_FROM_NAME || 'TimeCapsule';
+
+  if (!apiKey || !apiSecret) {
+    throw new Error('MAILJET_API_KEY dan MAILJET_API_SECRET wajib diisi saat EMAIL_PROVIDER=mailjet');
+  }
+
+  if (!senderEmail) {
+    throw new Error('MAILJET_SENDER_EMAIL atau GMAIL_USER wajib diisi saat EMAIL_PROVIDER=mailjet');
+  }
+
+  const recipient = parseEmailAddress(mailOptions.to);
+  const response = await fetch('https://api.mailjet.com/v3.1/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString('base64')}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      Messages: [
+        {
+          From: {
+            Email: senderEmail,
+            Name: senderName
+          },
+          To: [
+            {
+              Email: recipient.email,
+              Name: recipient.name || recipient.email
+            }
+          ],
+          Subject: mailOptions.subject,
+          TextPart: mailOptions.text,
+          HTMLPart: mailOptions.html
+        }
+      ]
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const mailjetError = new Error(data.ErrorMessage || data.Messages?.[0]?.Errors?.[0]?.ErrorMessage || 'Gagal mengirim email via Mailjet');
+    mailjetError.status = response.status;
+    mailjetError.response = data;
+    throw mailjetError;
+  }
+
+  console.log(`${label} terkirim via Mailjet:`, data.Messages?.[0]?.To?.[0]?.MessageID || data.Messages?.[0]?.Status || 'sent');
+  return data;
+};
+
+const sendMail = async (mailOptions, label) => {
+  if ((process.env.EMAIL_PROVIDER || '').toLowerCase() === 'mailjet') {
+    return await sendMailViaMailjet(mailOptions, label);
+  }
+
+  return await sendMailViaSmtp(mailOptions, label);
 };
 
 const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {

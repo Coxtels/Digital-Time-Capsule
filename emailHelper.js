@@ -2,12 +2,12 @@ const nodemailer = require('nodemailer');
 const dns = require('dns').promises;
 const net = require('net');
 
-const resolveSmtpConnectionTarget = async (smtpHost) => {
+const resolveSmtpConnectionTargets = async (smtpHost) => {
   if (process.env.SMTP_FORCE_IPV4 === 'false' || net.isIP(smtpHost)) {
-    return {
+    return [{
       host: smtpHost,
       servername: net.isIP(smtpHost) ? process.env.SMTP_SERVERNAME || 'smtp.gmail.com' : smtpHost
-    };
+    }];
   }
 
   const addresses = await dns.resolve4(smtpHost);
@@ -16,16 +16,14 @@ const resolveSmtpConnectionTarget = async (smtpHost) => {
     throw new Error(`Tidak menemukan alamat IPv4 untuk SMTP host ${smtpHost}`);
   }
 
-  return {
-    host: addresses[0],
+  return addresses.map((address) => ({
+    host: address,
     servername: smtpHost
-  };
+  }));
 };
 
-const createTransporter = async () => {
-  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+const createTransporter = (connectionTarget) => {
   const smtpPort = Number(process.env.SMTP_PORT || 587);
-  const connectionTarget = await resolveSmtpConnectionTarget(smtpHost);
 
   return nodemailer.createTransport({
     host: connectionTarget.host,
@@ -46,10 +44,41 @@ const createTransporter = async () => {
   });
 };
 
+const isRetryableSmtpConnectionError = (error) => {
+  return ['ETIMEDOUT', 'ESOCKET', 'ECONNECTION', 'ENETUNREACH', 'ECONNREFUSED'].includes(error.code);
+};
+
+const sendMail = async (mailOptions, label) => {
+  const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const targets = await resolveSmtpConnectionTargets(smtpHost);
+  let lastError;
+
+  for (const target of targets) {
+    try {
+      const transporter = createTransporter(target);
+      console.log(`Mencoba mengirim ${label} via SMTP ${target.servername} (${target.host})`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`${label} terkirim:`, info.messageId);
+      return info;
+    } catch (error) {
+      lastError = error;
+      console.error(`${label} gagal via ${target.host}:`, {
+        code: error.code,
+        command: error.command,
+        message: error.message
+      });
+
+      if (!isRetryableSmtpConnectionError(error)) {
+        throw error;
+      }
+    }
+  }
+
+  throw lastError;
+};
+
 const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {
   try {
-    const transporter = await createTransporter();
-    
     // Escape simple HTML characters for safety in HTML email
     const escapeHtml = (text) => {
       return String(text).replace(/[&<>"']/g, function(m) {
@@ -80,9 +109,7 @@ const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {
              <br><p>Salam,<br>Tim TimeCapsule</p>`
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email verifikasi terkirim:', info.messageId);
-    return info;
+    return await sendMail(mailOptions, 'Email verifikasi');
   } catch (error) {
     console.error('Error saat mengirim email verifikasi:', error);
     throw error;
@@ -91,8 +118,6 @@ const sendVerificationEmail = async (email, nama_lengkap, verificationLink) => {
 
 const sendCapsuleCreatedEmail = async (email, nama_lengkap, judul_pesan, tanggal_buka) => {
   try {
-    const transporter = await createTransporter();
-    
     // Format tanggal untuk bahasa Indonesia
     const date = new Date(tanggal_buka);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -106,9 +131,7 @@ const sendCapsuleCreatedEmail = async (email, nama_lengkap, judul_pesan, tanggal
       html: `<p>Halo <strong>${nama_lengkap}</strong>,</p><p>Kapsul waktu Anda dengan judul "<strong>${judul_pesan}</strong>" berhasil disimpan.</p><p>Kapsul ini akan terbuka pada <strong>${formattedDate}</strong>.</p><br><p>Salam,<br>Tim TimeCapsule</p>`
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email konfirmasi kapsul terkirim:', info.messageId);
-    return info;
+    return await sendMail(mailOptions, 'Email konfirmasi kapsul');
   } catch (error) {
     console.error('Error saat mengirim email kapsul:', error);
     throw error;

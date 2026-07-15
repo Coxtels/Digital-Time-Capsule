@@ -19,7 +19,7 @@ Project ini dibuat sebagai aplikasi full-stack sederhana dengan backend Node.js,
 
 - **Backend:** Node.js, Express.js
 - **Database:** MySQL
-- **Email:** Nodemailer dengan Gmail SMTP
+- **Email:** Nodemailer dengan Gmail SMTP, Mailjet API, atau Resend API
 - **Frontend:** HTML, Vanilla JavaScript, Tailwind CSS
 - **Package Manager:** npm
 
@@ -55,7 +55,7 @@ Pastikan perangkat sudah memiliki:
 - Node.js
 - npm
 - MySQL
-- Akun Gmail untuk email pengirim sistem
+- Akun Gmail untuk SMTP lokal atau akun provider email transactional seperti Mailjet/Resend untuk deployment
 
 MySQL dapat dijalankan melalui Laragon, XAMPP, Docker, atau instalasi MySQL lokal lain selama konfigurasi `.env` sesuai.
 
@@ -96,6 +96,11 @@ MAILJET_API_SECRET=
 MAILJET_SENDER_EMAIL=
 MAILJET_SENDER_NAME=TimeCapsule
 
+# Alternatif provider email transactional via Resend API
+RESEND_API_KEY=
+RESEND_SENDER_EMAIL=
+RESEND_SENDER_NAME=TimeCapsule
+
 APP_BASE_URL=http://localhost:3000
 
 DB_HOST=localhost
@@ -109,8 +114,9 @@ Keterangan:
 
 - `GMAIL_USER` adalah email sistem yang mengirim notifikasi.
 - `GMAIL_APP_PASSWORD` adalah Google App Password, bukan password login Gmail biasa.
-- `EMAIL_PROVIDER=smtp` menggunakan Gmail SMTP. Untuk Railway, gunakan `EMAIL_PROVIDER=mailjet`.
+- `EMAIL_PROVIDER=smtp` menggunakan Gmail SMTP. Untuk Railway, gunakan provider API seperti `EMAIL_PROVIDER=mailjet` atau `EMAIL_PROVIDER=resend`.
 - `MAILJET_*` digunakan saat email dikirim lewat Mailjet API.
+- `RESEND_*` digunakan saat email dikirim lewat Resend API.
 - `APP_BASE_URL` digunakan untuk membuat link verifikasi email.
 - `DB_*` digunakan untuk koneksi backend ke MySQL.
 

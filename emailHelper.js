@@ -147,9 +147,57 @@ const sendMailViaMailjet = async (mailOptions, label) => {
   return data;
 };
 
+const sendMailViaResend = async (mailOptions, label) => {
+  const apiKey = process.env.RESEND_API_KEY;
+  const senderEmail = process.env.RESEND_SENDER_EMAIL || process.env.GMAIL_USER;
+  const senderName = process.env.RESEND_SENDER_NAME || process.env.MAIL_FROM_NAME || 'TimeCapsule';
+
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY wajib diisi saat EMAIL_PROVIDER=resend');
+  }
+
+  if (!senderEmail) {
+    throw new Error('RESEND_SENDER_EMAIL atau GMAIL_USER wajib diisi saat EMAIL_PROVIDER=resend');
+  }
+
+  const recipient = parseEmailAddress(mailOptions.to);
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: `${senderName} <${senderEmail}>`,
+      to: [recipient.email],
+      subject: mailOptions.subject,
+      text: mailOptions.text,
+      html: mailOptions.html
+    })
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const resendError = new Error(data.message || 'Gagal mengirim email via Resend');
+    resendError.status = response.status;
+    resendError.response = data;
+    throw resendError;
+  }
+
+  console.log(`${label} terkirim via Resend:`, data.id || 'sent');
+  return data;
+};
+
 const sendMail = async (mailOptions, label) => {
-  if ((process.env.EMAIL_PROVIDER || '').toLowerCase() === 'mailjet') {
+  const emailProvider = (process.env.EMAIL_PROVIDER || '').toLowerCase();
+
+  if (emailProvider === 'mailjet') {
     return await sendMailViaMailjet(mailOptions, label);
+  }
+
+  if (emailProvider === 'resend') {
+    return await sendMailViaResend(mailOptions, label);
   }
 
   return await sendMailViaSmtp(mailOptions, label);

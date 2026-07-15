@@ -211,6 +211,7 @@ Token verifikasi berlaku selama 24 jam. Jika token kedaluwarsa atau email tidak 
 | `POST` | `/api/messages` | Membuat kapsul waktu baru. |
 | `GET` | `/api/messages?userId=...` | Mengambil daftar kapsul waktu milik pengguna. |
 | `PATCH` | `/api/messages/:id/evaluation` | Menyimpan status capaian dan catatan evaluasi pesan yang sudah terbuka. |
+| `DELETE` | `/api/messages/:id` | Menghapus kapsul waktu milik pengguna. |
 
 ## Contoh Response Penting
 
@@ -233,7 +234,7 @@ Jika registrasi berhasil dan email verifikasi dikirim:
 }
 ```
 
-## Catatan Development
+## Catatan Penting
 
 - File `.env` tidak boleh di-commit.
 - File `node_modules/` tidak boleh di-commit.

@@ -381,6 +381,37 @@ app.patch('/api/messages/:id/evaluation', (req, res) => {
   );
 });
 
+// Endpoint 3c: Menghapus pesan kapsul milik user
+app.delete('/api/messages/:id', (req, res) => {
+  const messageId = Number(req.params.id);
+  const { user_id } = req.body;
+
+  if (!Number.isInteger(messageId) || messageId <= 0) {
+    return res.status(400).json({ message: 'ID pesan tidak valid' });
+  }
+
+  if (!user_id) {
+    return res.status(400).json({ message: 'User ID wajib diisi' });
+  }
+
+  db.query(
+    'DELETE FROM messages WHERE id = ? AND user_id = ?',
+    [messageId, user_id],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Gagal menghapus pesan' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Pesan tidak ditemukan' });
+      }
+
+      res.status(200).json({ message: 'Pesan berhasil dihapus' });
+    }
+  );
+});
+
 // Endpoint 4: Mengambil semua pesan kapsul
 app.get('/api/messages', (req, res) => {
   const userId = req.query.userId;
